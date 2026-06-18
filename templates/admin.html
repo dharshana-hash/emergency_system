@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <h1 class="h2 fw-bold text-dark mb-4">🛡️ Command Operations Room</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow border-0 p-3 h-100">
+                <h5 class="fw-bold text-muted mb-3">Threat Ratios</h5>
+                <div style="max-height: 220px;" class="d-flex justify-content-center">
+                    <canvas id="disasterChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card shadow border-0 p-3 h-100">
+                <h5 class="fw-bold text-muted mb-3">Workflow Lifecycle Pipeline</h5>
+                <div style="max-height: 220px;" class="d-flex justify-content-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 p-3">
+        <h5 class="fw-bold text-dark mb-3">Incident Matrix Queue</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Priority</th>
+                        <th>Victim Name</th>
+                        <th>Contact Number</th>
+                        <th>Location Coordinates</th>
+                        <th>Category</th>
+                        <th>Scale</th>
+                        <th>Lifecycle State</th>
+                        <th>Dispatched Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr class="{% if req.priority_score >= 8.0 %}table-danger{% elif req.priority_score >= 6.0 %}table-warning{% endif %}">
+                        <td><span class="badge bg-dark fs-6 w-100 py-2">{{ req.priority_score }}</span></td>
+                        <td class="fw-bold">{{ req.name }}</td>
+                        <td>{{ req.phone }}</td>
+                        <td>{{ req.location }}</td>
+                        <td><span class="badge bg-secondary">{{ req.disaster_type }}</span></td>
+                        <td class="fw-bold">{{ req.severity }}/10</td>
+                        <td>
+                            <form method="POST" action="/update_status/{{ req.id }}" class="d-flex gap-1">
+                                <select name="status" class="form-select form-select-sm fw-bold">
+                                    <option value="Pending" {% if req.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="In Progress" {% if req.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if req.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-dark">Save</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="POST" action="/update_status/{{ req.id }}" class="d-flex gap-1">
+                                <input type="hidden" name="status" value="{{ req.status }}">
+                                <input type="text" name="volunteer_name" class="form-control form-control-sm" value="{{ req.assigned_volunteer }}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Assign</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    fetch('/api/analytics')
+        .then(res => res.json())
+        .then(data => {
+            new Chart(document.getElementById('disasterChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(data.disasters),
+                    datasets: [{
+                        data: Object.values(data.disasters),
+                        backgroundColor: ['#dc3545', '#0d6efd', '#ffc107', '#198754', '#6c757d']
+                    }]
+                }
+            });
+
+            new Chart(document.getElementById('statusChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.statuses),
+                    datasets: [{
+                        label: 'Total Active Incidents',
+                        data: Object.values(data.statuses),
+                        backgroundColor: ['#f8d7da', '#fff3cd', '#d1e7dd'],
+                        borderColor: ['#dc3545', '#ffc107', '#198754'],
+                        borderWidth: 2
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        });
+</script>
+{% endblock %}

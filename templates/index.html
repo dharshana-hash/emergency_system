@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 card shadow border-0 p-4">
+            <h2 class="text-danger text-center fw-bold mb-4">🚨 Civilian Emergency Broadcast</h2>
+            <form method="POST" action="/">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Caller Full Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Jane Doe" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Active Contact Line Phone Number</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="+1234567890" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Target Location Landmarks / Details</label>
+                    <textarea name="location" class="form-control" rows="2" placeholder="Be as specific as possible..." required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Disaster Variant Category</label>
+                    <select name="disaster_type" class="form-select" required>
+                        <option value="Earthquake">Earthquake</option>
+                        <option value="Flood" selected>Flood</option>
+                        <option value="Cyclone">Cyclone</option>
+                        <option value="Landslide">Landslide</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Current Threat Severity Scale (1-10)</label>
+                    <input type="range" name="severity" class="form-range" min="1" max="10" value="5" oninput="this.nextElementSibling.value = this.value">
+                    <output class="fw-bold text-danger fs-5">5</output>
+                </div>
+                <button type="submit" class="btn btn-danger w-100 py-2 fw-bold shadow">BROADCAST SIGNAL</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

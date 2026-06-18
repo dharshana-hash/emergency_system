@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="fw-bold text-dark mb-4">⛑️ Active Field Responder Fleet Operations</h2>
+    <div class="row">
+        {% for req in requests %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow border-0 border-start border-5 {% if req.status == 'Completed' %}border-success{% elif req.status == 'In Progress' %}border-warning{% else %}border-danger{% endif %}">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-danger">Priority: {{ req.priority_score }}</span>
+                            <span class="badge bg-light text-dark border">{{ req.disaster_type }}</span>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark">{{ req.name }}</h5>
+                        <p class="card-text mb-1 small">📍 <strong>Location:</strong> {{ req.location }}</p>
+                        <p class="card-text mb-2 small">📞 <strong>Contact:</strong> {{ req.phone }}</p>
+                        <p class="card-text small">🛡️ <strong>Assigned Unit:</strong> <span class="badge bg-secondary">{{ req.assigned_volunteer }}</span></p>
+                    </div>
+                    <form method="POST" action="/update_status/{{ req.id }}" class="border-top pt-3">
+                        <div class="d-flex gap-2">
+                            <select name="status" class="form-select form-select-sm fw-bold">
+                                <option value="Pending" {% if req.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if req.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if req.status == 'Completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
